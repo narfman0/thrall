@@ -1,13 +1,16 @@
 package com.blastedstudios.thrall.components;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.gdx.math.Vector2;
 
 public class MovementComponent implements Component {
-	public float velocityX;
-	public float velocityY;
+	public Vector2 velocity;
 
-	public MovementComponent (float velocityX, float velocityY) {
-		this.velocityX = velocityX;
-		this.velocityY = velocityY;
+	public MovementComponent(float x, float y) {
+		velocity = new Vector2(x, y);
+	}
+
+	public MovementComponent(Vector2 position) {
+		this.velocity = position;
 	}
 }
