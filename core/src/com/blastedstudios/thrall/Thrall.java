@@ -1,7 +1,5 @@
 package com.blastedstudios.thrall;
 
-import java.util.Random;
-
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
@@ -15,6 +13,7 @@ import com.blastedstudios.thrall.components.MovementComponent;
 import com.blastedstudios.thrall.components.PositionComponent;
 import com.blastedstudios.thrall.systems.MovementSystem;
 import com.blastedstudios.thrall.systems.PositionSystem;
+import com.blastedstudios.thrall.world.World;
 
 public class Thrall extends ApplicationAdapter {
 	Batch batch;
@@ -22,12 +21,12 @@ public class Thrall extends ApplicationAdapter {
 	PooledEngine engine;
 	MovementSystem movementSystem;
 	PositionSystem positionSystem;
-	Random random;
+	World world;
 	ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 	
 	@Override
 	public void create () {
-		random = new Random();
+		world = new World();
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
 		
@@ -39,8 +38,8 @@ public class Thrall extends ApplicationAdapter {
 
 		for (int i = 0; i < 10; i++) {
 			Entity entity = engine.createEntity();
-			entity.add(new PositionComponent(random.nextFloat()*30f, random.nextFloat()*30));
-			entity.add(new MovementComponent(random.nextFloat()/3f, random.nextFloat()/3f));
+			entity.add(new PositionComponent(world.random.nextFloat()*30f, world.random.nextFloat()*30));
+			entity.add(new MovementComponent(world.random.nextFloat()/3f, world.random.nextFloat()/3f));
 			engine.addEntity(entity);
 		}
 
