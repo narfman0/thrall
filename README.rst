@@ -8,9 +8,7 @@ TODO
 
 Phase1
 
-#. Render populated world in overworld screen
-#. Allow for method of travel in vehicle
-#. Currency ($, iron, people, food, fuel)
+#. Click to travel
 #. Overworld encounters (trade, bandits)
 
 Phase2

@@ -3,7 +3,7 @@ package com.blastedstudios.thrall.world.entity;
 import com.badlogic.gdx.math.Vector2;
 
 public abstract class Entity {
-	private final Vector2 position, velocity;
+	protected final Vector2 position, velocity;
 	
 	public Entity(Vector2 position, Vector2 velocity){
 		this.position = position;

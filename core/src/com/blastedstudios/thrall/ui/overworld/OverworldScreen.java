@@ -11,11 +11,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.blastedstudios.thrall.Thrall;
 import com.blastedstudios.thrall.ui.AbstractGame;
 import com.blastedstudios.thrall.ui.AbstractScreen;
@@ -29,25 +24,18 @@ public class OverworldScreen extends AbstractScreen {
 	private final ShapeRenderer renderer = new ShapeRenderer();
 	private final OrthographicCamera camera = new OrthographicCamera(28, 20);
 	private final boolean DEBUG_DRAW = false;
+	private final float MOVEMENT_SCALAR = 400f;
 	private final World world;
 	private final HashMap<Entity, Texture> worldTextures = new HashMap<>();
 	private Batch batch = new SpriteBatch();
 	private Texture sandTexture;
+	private boolean followVehicle = true;
+	private final CurrencyWindow currencyWindow;
 	
 	public OverworldScreen(final AbstractGame game){
 		super(game, Thrall.SKIN_PATH);
-		final Button exitButton = new TextButton("Exit", skin);
-		exitButton.addListener(new ClickListener() {
-			@Override public void clicked(InputEvent event, float x, float y) {
-				game.popScreen();
-			}
-		});
-		Window window = new Window("Options", skin);
-		window.add(exitButton);
-		window.pack();
-		window.setX(Gdx.graphics.getWidth() - window.getWidth());
-		window.setY(Gdx.graphics.getHeight() - window.getHeight());
-		stage.addActor(window);
+		stage.addActor(new OptionsWindow(skin, game));
+		stage.addActor(currencyWindow = new CurrencyWindow(skin, game));
 
 		world = new World(System.nanoTime());
 		for(Entity entity : world.getEntities()){
@@ -59,18 +47,34 @@ public class OverworldScreen extends AbstractScreen {
 		camera.zoom += 3;
 	}
 	
-	@Override public void render(float delta){
-		super.render(delta);
-		world.render(Gdx.graphics.getDeltaTime());
+	@Override public void render(float dt){
+		super.render(dt);
+		world.render(dt);
+		currencyWindow.render(dt, world);
 		
-		if(Gdx.input.isKeyPressed(Keys.UP))
-			camera.position.y += camera.zoom;
-		if(Gdx.input.isKeyPressed(Keys.DOWN))
-			camera.position.y -= camera.zoom;
-		if(Gdx.input.isKeyPressed(Keys.RIGHT))
-			camera.position.x += camera.zoom;
-		if(Gdx.input.isKeyPressed(Keys.LEFT))
-			camera.position.x -= camera.zoom;
+		if(followVehicle){
+			camera.position.x = world.getPlayerVehicle().getPosition().x;
+			camera.position.y = world.getPlayerVehicle().getPosition().y;
+			if(world.getFuel() > 0f && world.getPeople() > 0f){
+				if(Gdx.input.isKeyPressed(Keys.UP))
+					world.getPlayerVehicle().getVelocity().add(0, MOVEMENT_SCALAR*dt);
+				if(Gdx.input.isKeyPressed(Keys.DOWN))
+					world.getPlayerVehicle().getVelocity().add(0, MOVEMENT_SCALAR*-dt);
+				if(Gdx.input.isKeyPressed(Keys.RIGHT))
+					world.getPlayerVehicle().getVelocity().add(MOVEMENT_SCALAR*dt, 0);
+				if(Gdx.input.isKeyPressed(Keys.LEFT))
+					world.getPlayerVehicle().getVelocity().add(MOVEMENT_SCALAR*-dt, 0);
+			}
+		}else{
+			if(Gdx.input.isKeyPressed(Keys.UP))
+				camera.position.y += camera.zoom;
+			if(Gdx.input.isKeyPressed(Keys.DOWN))
+				camera.position.y -= camera.zoom;
+			if(Gdx.input.isKeyPressed(Keys.RIGHT))
+				camera.position.x += camera.zoom;
+			if(Gdx.input.isKeyPressed(Keys.LEFT))
+				camera.position.x -= camera.zoom;
+		}
 		camera.update();
 		
 		if(DEBUG_DRAW){
@@ -92,6 +96,15 @@ public class OverworldScreen extends AbstractScreen {
 			batch.end();
 		}
 		stage.draw();
+	}
+	
+	@Override public boolean keyDown(int key) {
+		switch(key){
+		case Keys.SPACE:
+			followVehicle = !followVehicle;
+			break;
+		}
+		return super.keyDown(key);
 	}
 
 	@Override public boolean scrolled(int amount) {
