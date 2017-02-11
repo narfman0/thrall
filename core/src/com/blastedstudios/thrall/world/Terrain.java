@@ -4,10 +4,8 @@ import java.util.Random;
 
 public class Terrain {
 	public final TileEnum[][] tiles;
-	public final Random random;
 	
-	public Terrain(long seed){
-		random = new Random(seed);
+	public Terrain(Random random){
 		int width = random.nextInt(50) + 200;
 		tiles = new TileEnum[width][width];
 		for(int i=0; i<width; i++)

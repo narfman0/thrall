@@ -1,5 +1,7 @@
 package com.blastedstudios.thrall.ui.overworld;
 
+import java.util.HashMap;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
@@ -19,17 +21,18 @@ import com.blastedstudios.thrall.ui.AbstractGame;
 import com.blastedstudios.thrall.ui.AbstractScreen;
 import com.blastedstudios.thrall.ui.main.MainScreen;
 import com.blastedstudios.thrall.util.Log;
-import com.blastedstudios.thrall.world.Entity;
 import com.blastedstudios.thrall.world.World;
+import com.blastedstudios.thrall.world.entity.Entity;
 
 public class OverworldScreen extends AbstractScreen {
 	private static final String TAG = MainScreen.class.getName();
 	private final ShapeRenderer renderer = new ShapeRenderer();
 	private final OrthographicCamera camera = new OrthographicCamera(28, 20);
 	private final boolean DEBUG_DRAW = false;
+	private final World world;
+	private final HashMap<Entity, Texture> worldTextures = new HashMap<>();
 	private Batch batch = new SpriteBatch();
-	private Texture img;
-	private World world;
+	private Texture sandTexture;
 	
 	public OverworldScreen(final AbstractGame game){
 		super(game, Thrall.SKIN_PATH);
@@ -46,8 +49,13 @@ public class OverworldScreen extends AbstractScreen {
 		window.setY(Gdx.graphics.getHeight() - window.getHeight());
 		stage.addActor(window);
 
-		world = new World();
-		img = new Texture("badlogic.jpg");
+		world = new World(System.nanoTime());
+		for(Entity entity : world.getEntities()){
+			String name = entity.getClass().getSimpleName(),
+					imgName = name.substring(0, name.length()-6);
+			worldTextures.put(entity, new Texture("overworld/" + imgName + ".png"));
+		}
+		sandTexture = new Texture("overworld/sand.jpg");
 		camera.zoom += 3;
 	}
 	
@@ -75,15 +83,19 @@ public class OverworldScreen extends AbstractScreen {
 		}else{
 			batch.setProjectionMatrix(camera.combined);
 			batch.begin();
+			float tileSize = 32f;
+			for(float x=camera.position.x-tileSize*camera.zoom-tileSize; x<camera.position.x+tileSize*camera.zoom+tileSize; x+=tileSize)
+				for(float y=camera.position.y-tileSize*camera.zoom-tileSize; y<camera.position.y+tileSize*camera.zoom+tileSize; y+=tileSize)
+					batch.draw(sandTexture, x-x%32, y-y%32, 32f, 32f);
 			for (Entity entity : world.getEntities())
-				batch.draw(img, entity.getPosition().x, entity.getPosition().y, 3f, 3f);
+				batch.draw(worldTextures.get(entity), entity.getPosition().x, entity.getPosition().y, 3f, 3f);
 			batch.end();
 		}
 		stage.draw();
 	}
 
 	@Override public boolean scrolled(int amount) {
-		camera.zoom = Math.max(.01f, camera.zoom + amount*camera.zoom/4f);
+		camera.zoom = Math.min(5, Math.max(1f, camera.zoom + amount*camera.zoom/4f));
 		Log.log(TAG, "Scroll amount: " + amount + " camera.zoom: " + camera.zoom);
 		return false;
 	}
@@ -91,6 +103,8 @@ public class OverworldScreen extends AbstractScreen {
 	@Override
 	public void dispose () {
 		batch.dispose();
-		img.dispose();
+		sandTexture.dispose();
+		for(Texture texture : worldTextures.values())
+			texture.dispose();
 	}
 }
