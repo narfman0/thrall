@@ -6,6 +6,8 @@ import java.util.Random;
 
 import com.badlogic.gdx.math.Vector2;
 import com.blastedstudios.thrall.util.Log;
+import com.blastedstudios.thrall.world.encounter.Encounter;
+import com.blastedstudios.thrall.world.encounter.Generator;
 import com.blastedstudios.thrall.world.entity.Entity;
 import com.blastedstudios.thrall.world.entity.FarmEntity;
 import com.blastedstudios.thrall.world.entity.MineEntity;
@@ -20,8 +22,11 @@ public class World {
 	public final Random random;
 	private float food, fuel;
 	private int cash, iron, people;
+	private Entity lastVisited = null;
+	private final IEncounterListener encounterListener;
 	
-	public World(long seed) {
+	public World(long seed, IEncounterListener encounterListener) {
+		this.encounterListener = encounterListener;
 		random = new Random(seed);
 		terrain = new Terrain(random);
 		entities = new LinkedList<>();
@@ -54,6 +59,9 @@ public class World {
 		fuel = Math.max(0, fuel-dt*playerVehicle.getVelocity().len()/10f);
 		if(food <= 0f && random.nextGaussian() > .99f)
 			people = Math.max(0, people-1);
+		Encounter encounter = Generator.checkEncounter(this);
+		if(encounter != null)
+			encounterListener.triggerEncounter(encounter);
 	}
 
 	public List<Entity> getEntities() {
@@ -126,5 +134,13 @@ public class World {
 	
 	public void addPeople(int people) {
 		this.people += people;
+	}
+
+	public Entity getLastVisited() {
+		return lastVisited;
+	}
+
+	public void setLastVisited(Entity lastVisited) {
+		this.lastVisited = lastVisited;
 	}
 }

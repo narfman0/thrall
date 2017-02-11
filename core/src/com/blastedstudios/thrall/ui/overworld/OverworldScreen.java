@@ -16,10 +16,13 @@ import com.blastedstudios.thrall.ui.AbstractGame;
 import com.blastedstudios.thrall.ui.AbstractScreen;
 import com.blastedstudios.thrall.ui.main.MainScreen;
 import com.blastedstudios.thrall.util.Log;
+import com.blastedstudios.thrall.world.IEncounterListener;
 import com.blastedstudios.thrall.world.World;
+import com.blastedstudios.thrall.world.encounter.Encounter;
+import com.blastedstudios.thrall.world.encounter.Generator;
 import com.blastedstudios.thrall.world.entity.Entity;
 
-public class OverworldScreen extends AbstractScreen {
+public class OverworldScreen extends AbstractScreen implements IEncounterListener {
 	private static final String TAG = MainScreen.class.getName();
 	private final ShapeRenderer renderer = new ShapeRenderer();
 	private final OrthographicCamera camera = new OrthographicCamera(28, 20);
@@ -31,13 +34,14 @@ public class OverworldScreen extends AbstractScreen {
 	private Texture sandTexture;
 	private boolean followVehicle = true;
 	private final CurrencyWindow currencyWindow;
+	private EncounterWindow encounterWindow = null;
 	
 	public OverworldScreen(final AbstractGame game){
 		super(game, Thrall.SKIN_PATH);
 		stage.addActor(new OptionsWindow(skin, game));
 		stage.addActor(currencyWindow = new CurrencyWindow(skin, game));
 
-		world = new World(System.nanoTime());
+		world = new World(System.nanoTime(), this);
 		for(Entity entity : world.getEntities()){
 			String name = entity.getClass().getSimpleName(),
 					imgName = name.substring(0, name.length()-6);
@@ -92,7 +96,7 @@ public class OverworldScreen extends AbstractScreen {
 				for(float y=camera.position.y-tileSize*camera.zoom-tileSize; y<camera.position.y+tileSize*camera.zoom+tileSize; y+=tileSize)
 					batch.draw(sandTexture, x-x%32, y-y%32, 32f, 32f);
 			for (Entity entity : world.getEntities())
-				batch.draw(worldTextures.get(entity), entity.getPosition().x, entity.getPosition().y, 3f, 3f);
+				batch.draw(worldTextures.get(entity), entity.getPosition().x, entity.getPosition().y, Generator.ENCOUNTER_DISTANCE, Generator.ENCOUNTER_DISTANCE);
 			batch.end();
 		}
 		stage.draw();
@@ -119,5 +123,13 @@ public class OverworldScreen extends AbstractScreen {
 		sandTexture.dispose();
 		for(Texture texture : worldTextures.values())
 			texture.dispose();
+	}
+
+	@Override
+	public void triggerEncounter(Encounter encounter) {
+		stage.addActor(encounterWindow = new EncounterWindow(skin, game, world, () -> {
+			encounterWindow.remove();
+			encounterWindow = null;
+		}, encounter));
 	}
 }
