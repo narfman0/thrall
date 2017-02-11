@@ -16,8 +16,8 @@ public class World {
 		entities = new LinkedList<>();
 		
 		for (int i = 0; i < 10; i++) {
-			Vector2 position = new Vector2(world.random.nextFloat()*30f, world.random.nextFloat()*30);
-			Vector2 velocity = new Vector2(world.random.nextFloat()/3f, world.random.nextFloat()/3f);
+			Vector2 position = new Vector2(world.random.nextFloat()*300f, world.random.nextFloat()*300);
+			Vector2 velocity = new Vector2(world.random.nextFloat()/30f, world.random.nextFloat()/30f);
 			entities.add(new Entity(position, velocity));
 		}
 

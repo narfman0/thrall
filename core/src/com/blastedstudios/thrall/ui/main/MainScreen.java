@@ -6,13 +6,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.blastedstudios.thrall.Thrall;
 import com.blastedstudios.thrall.ui.AbstractGame;
 import com.blastedstudios.thrall.ui.AbstractScreen;
 import com.blastedstudios.thrall.ui.overworld.OverworldScreen;
+import com.blastedstudios.thrall.util.Log;
 
 public class MainScreen extends AbstractScreen {
+	private static final String TAG = MainScreen.class.getName();
+
 	public MainScreen(final AbstractGame game){
-		super(game, "ui/uiskin.json");
+		super(game, Thrall.SKIN_PATH);
 		final Button newButton = new TextButton("New", skin);
 		final Button exitButton = new TextButton("Exit", skin);
 		newButton.addListener(new ClickListener() {
@@ -33,6 +37,7 @@ public class MainScreen extends AbstractScreen {
 		window.setX(Gdx.graphics.getWidth()/2 - window.getWidth()/2);
 		window.setY(Gdx.graphics.getHeight()/2 - window.getHeight()/2);
 		stage.addActor(window);
+		Log.debug(TAG, "Initialized");
 	}
 	
 	@Override public void render(float delta){
