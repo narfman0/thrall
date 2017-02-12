@@ -24,6 +24,7 @@ public class World {
 	private int cash, iron, people;
 	private Entity lastVisited = null;
 	private final IEncounterListener encounterListener;
+	private Encounter encounter = null;
 	
 	public World(long seed, IEncounterListener encounterListener) {
 		this.encounterListener = encounterListener;
@@ -53,15 +54,21 @@ public class World {
 	}
 
 	public void render (float dt) {
+		if(encounter != null)
+			return;
 		for (Entity entity : entities)
 			entity.render(dt);
 		food = Math.max(0, food-dt/10f*people);
 		fuel = Math.max(0, fuel-dt*playerVehicle.getVelocity().len()/10f);
 		if(food <= 0f && random.nextGaussian() > .99f)
 			people = Math.max(0, people-1);
-		Encounter encounter = Generator.checkEncounter(this);
+		encounter = Generator.checkEncounter(this);
 		if(encounter != null)
 			encounterListener.triggerEncounter(encounter);
+	}
+
+	public void encounterComplete() {
+		encounter = null;
 	}
 
 	public List<Entity> getEntities() {
@@ -142,5 +149,9 @@ public class World {
 
 	public void setLastVisited(Entity lastVisited) {
 		this.lastVisited = lastVisited;
+	}
+
+	public Encounter getEncounter() {
+		return encounter;
 	}
 }

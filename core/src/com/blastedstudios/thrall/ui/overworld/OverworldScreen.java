@@ -59,7 +59,7 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 		if(followVehicle){
 			camera.position.x = world.getPlayerVehicle().getPosition().x;
 			camera.position.y = world.getPlayerVehicle().getPosition().y;
-			if(world.getFuel() > 0f && world.getPeople() > 0f){
+			if(world.getEncounter() == null && world.getFuel() > 0f && world.getPeople() > 0f){
 				if(Gdx.input.isKeyPressed(Keys.UP))
 					world.getPlayerVehicle().getVelocity().add(0, MOVEMENT_SCALAR*dt);
 				if(Gdx.input.isKeyPressed(Keys.DOWN))
@@ -128,8 +128,10 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 	@Override
 	public void triggerEncounter(Encounter encounter) {
 		stage.addActor(encounterWindow = new EncounterWindow(skin, game, world, () -> {
-			encounterWindow.remove();
+			if(encounterWindow != null)
+				encounterWindow.remove();
 			encounterWindow = null;
+			world.encounterComplete();
 		}, encounter));
 	}
 }

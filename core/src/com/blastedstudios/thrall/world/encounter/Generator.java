@@ -6,6 +6,8 @@ import java.util.List;
 import com.blastedstudios.thrall.world.World;
 import com.blastedstudios.thrall.world.entity.Entity;
 import com.blastedstudios.thrall.world.entity.FarmEntity;
+import com.blastedstudios.thrall.world.entity.MineEntity;
+import com.blastedstudios.thrall.world.entity.TownEntity;
 
 public class Generator {
 	public static final float ENCOUNTER_DISTANCE = 3f;
@@ -21,7 +23,7 @@ public class Generator {
 			if(world.getPlayerVehicle().getPosition().dst(entity.getPosition()) < ENCOUNTER_DISTANCE/2f){
 				if(world.getLastVisited() != entity){
 					world.setLastVisited(entity);
-					return generateEncounter(entity);
+					return generateEncounter(world, entity);
 				}
 			}else if(world.getLastVisited() == entity)
 				world.setLastVisited(null);
@@ -29,14 +31,38 @@ public class Generator {
 		return null;
 	}
 	
-	public static Encounter generateEncounter(Entity entity){
+	public static Encounter generateEncounter(World world, Entity entity){
 		List<EncounterOption> options = new LinkedList<>();
 		String encounterText = "";
 		if(entity instanceof FarmEntity){
 			encounterText = "You have come upon a farm, where the proprieters offer food in return for gentleness.";
-			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", (world) -> {
+			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", (w) -> {
 				world.addFood(world.random.nextFloat()*3f+2);
 			}));
+		}else if(entity instanceof MineEntity){
+			encounterText = "You have come upon a mine, where the proprieters offer iron in return for gentleness.";
+			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", (w) -> {
+				world.addIron(world.random.nextInt(3)+2);
+			}));
+		}else if(entity instanceof TownEntity){
+			encounterText = "You have come upon a town, where the council offer cash in return for gentleness.";
+			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", (w) -> {
+				world.addCash(world.random.nextInt(10)+3);
+			}));
+			if(world.getCash() >= 100){
+				int fuel = world.random.nextInt(4)+3;
+				options.add(new EncounterOption("Trade 100$ for " + fuel + " fuel", (w) -> {
+					world.addFuel(fuel);
+					world.addCash(-100);
+				}));
+			}
+			if(world.getIron() >= 10){
+				int cash = world.random.nextInt(50)+15;
+				options.add(new EncounterOption("Trade 10 iron for " + cash + "$", (w) -> {
+					world.addIron(-10);
+					world.addCash(cash);
+				}));
+			}
 		}
 		return new Encounter(options, encounterText);
 	}
