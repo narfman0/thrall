@@ -3,6 +3,20 @@ Thrall
 
 A 2d coop roguelike for great justice
 
+Building
+--------
+
+#. Clone the project `https://github.com/narfman0/thrall.git`
+#. Open eclipse, go to File / Import, Gradle (STS)
+#. Select the cloned directory and click clone model (if necessary)
+#. Make sure all projects are clicked to import
+#. Click `Finish` to import, download dependencies, and build
+#. In the Debug or Run menus, click launcher named `DesktopLauncher`
+#. Alternatively, open thrall-desktop, expand src/com/etc, right
+   click `DesktopLauncher.java`, and Run or Debug. You will need to
+   change the default directory as thrall-android/assets for paths
+   to work properly.
+
 TODO
 ----
 

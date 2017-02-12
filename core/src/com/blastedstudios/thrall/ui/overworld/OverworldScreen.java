@@ -44,7 +44,7 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 		world = new World(System.nanoTime(), this);
 		for(Entity entity : world.getEntities()){
 			String name = entity.getClass().getSimpleName(),
-					imgName = name.substring(0, name.length()-6);
+					imgName = name.substring(0, name.length()-6).toLowerCase();
 			worldTextures.put(entity, new Texture("overworld/" + imgName + ".png"));
 		}
 		sandTexture = new Texture("overworld/sand.jpg");
@@ -106,6 +106,9 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 		switch(key){
 		case Keys.SPACE:
 			followVehicle = !followVehicle;
+			break;
+		case Keys.ESCAPE:
+			game.popScreen();
 			break;
 		}
 		return super.keyDown(key);
