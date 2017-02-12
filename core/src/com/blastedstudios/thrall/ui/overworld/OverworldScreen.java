@@ -3,6 +3,7 @@ package com.blastedstudios.thrall.ui.overworld;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -11,6 +12,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.blastedstudios.thrall.Thrall;
 import com.blastedstudios.thrall.ui.AbstractGame;
 import com.blastedstudios.thrall.ui.AbstractScreen;
@@ -35,6 +38,7 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 	private boolean followVehicle = true;
 	private final CurrencyWindow currencyWindow;
 	private EncounterWindow encounterWindow = null;
+	private Vector2 targetClickedLocation = null; 
 	
 	public OverworldScreen(final AbstractGame game){
 		super(game, Thrall.SKIN_PATH);
@@ -56,18 +60,38 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 		world.render(dt);
 		currencyWindow.render(dt, world);
 		
+		if (Gdx.input.isButtonPressed(Buttons.LEFT)){
+			int x = Gdx.input.getX(), y = Gdx.input.getY();
+			Vector2 stageCoordinates = stage.screenToStageCoordinates(new Vector2(x, y));
+		    if(stage.hit(stageCoordinates.x, stageCoordinates.y, false) == null){
+		    	Vector3 worldCoordinates = camera.unproject(new Vector3(x, y, 0));
+		    	targetClickedLocation = new Vector2(worldCoordinates.x, worldCoordinates.y);
+		    }
+		}
+		
 		if(followVehicle){
 			camera.position.x = world.getPlayerVehicle().getPosition().x;
 			camera.position.y = world.getPlayerVehicle().getPosition().y;
 			if(world.getEncounter() == null && world.getFuel() > 0f && world.getPeople() > 0f){
-				if(Gdx.input.isKeyPressed(Keys.UP))
-					world.getPlayerVehicle().getVelocity().add(0, MOVEMENT_SCALAR*dt);
-				if(Gdx.input.isKeyPressed(Keys.DOWN))
-					world.getPlayerVehicle().getVelocity().add(0, MOVEMENT_SCALAR*-dt);
-				if(Gdx.input.isKeyPressed(Keys.RIGHT))
-					world.getPlayerVehicle().getVelocity().add(MOVEMENT_SCALAR*dt, 0);
-				if(Gdx.input.isKeyPressed(Keys.LEFT))
-					world.getPlayerVehicle().getVelocity().add(MOVEMENT_SCALAR*-dt, 0);
+				if(targetClickedLocation != null){
+					if(targetClickedLocation.dst(world.getPlayerVehicle().getPosition()) < 1f ||
+							Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.DOWN) ||
+							Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.LEFT))
+						targetClickedLocation = null;
+					else{
+						Vector2 direction = targetClickedLocation.cpy().sub(world.getPlayerVehicle().getPosition()).nor();
+						world.getPlayerVehicle().getVelocity().add(direction.scl(MOVEMENT_SCALAR*dt));
+					}
+				}else{
+					if(Gdx.input.isKeyPressed(Keys.UP))
+						world.getPlayerVehicle().getVelocity().add(0, MOVEMENT_SCALAR*dt);
+					if(Gdx.input.isKeyPressed(Keys.DOWN))
+						world.getPlayerVehicle().getVelocity().add(0, MOVEMENT_SCALAR*-dt);
+					if(Gdx.input.isKeyPressed(Keys.RIGHT))
+						world.getPlayerVehicle().getVelocity().add(MOVEMENT_SCALAR*dt, 0);
+					if(Gdx.input.isKeyPressed(Keys.LEFT))
+						world.getPlayerVehicle().getVelocity().add(MOVEMENT_SCALAR*-dt, 0);
+				}
 			}
 		}else{
 			if(Gdx.input.isKeyPressed(Keys.UP))
@@ -113,7 +137,7 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 		}
 		return super.keyDown(key);
 	}
-
+	
 	@Override public boolean scrolled(int amount) {
 		camera.zoom = Math.min(5, Math.max(1f, camera.zoom + amount*camera.zoom/4f));
 		Log.log(TAG, "Scroll amount: " + amount + " camera.zoom: " + camera.zoom);

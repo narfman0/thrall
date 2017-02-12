@@ -63,8 +63,10 @@ public class World {
 		if(food <= 0f && random.nextGaussian() > .99f)
 			people = Math.max(0, people-1);
 		encounter = Generator.checkEncounter(this);
-		if(encounter != null)
+		if(encounter != null){
 			encounterListener.triggerEncounter(encounter);
+			playerVehicle.getVelocity().set(0,  0);
+		}
 	}
 
 	public void encounterComplete() {

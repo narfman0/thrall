@@ -22,7 +22,6 @@ TODO
 
 Phase1
 
-#. Click to travel
 #. Overworld encounters (trade, bandits)
 
 Phase2
