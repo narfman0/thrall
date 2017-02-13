@@ -58,10 +58,14 @@ public class World {
 			return;
 		for (Entity entity : entities)
 			entity.render(dt);
-		food = Math.max(0, food-dt/10f*people);
-		fuel = Math.max(0, fuel-dt*playerVehicle.getVelocity().len()/10f);
-		if(food <= 0f && random.nextGaussian() > .99f)
-			people = Math.max(0, people-1);
+		float velocityScalar = playerVehicle.getVelocity().len();
+		if(velocityScalar > .001f){
+			// only count time as moving when she ship is going. save food+people from starvation when AFK.
+			food = Math.max(0, food-dt/10f*people);
+			if(food <= 0f && random.nextGaussian() > .99f)
+				people = Math.max(0, people-1);
+		}
+		fuel = Math.max(0, fuel-dt*velocityScalar/10f);
 		encounter = Generator.checkEncounter(this);
 		if(encounter != null){
 			encounterListener.triggerEncounter(encounter);
