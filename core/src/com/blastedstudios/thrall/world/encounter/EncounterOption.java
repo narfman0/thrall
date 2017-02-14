@@ -1,10 +1,12 @@
 package com.blastedstudios.thrall.world.encounter;
 
+import com.blastedstudios.thrall.world.World;
+
 public class EncounterOption {
 	private final String choiceText;
-	private final IEncounterResult result;
+	private final IEncounterHandler result;
 	
-	public EncounterOption(String choiceText, IEncounterResult result){
+	public EncounterOption(String choiceText, IEncounterHandler result){
 		this.choiceText = choiceText;
 		this.result = result;
 	}
@@ -13,7 +15,7 @@ public class EncounterOption {
 		return choiceText;
 	}
 
-	public IEncounterResult getResult() {
-		return result;
+	public void execute(World world) {
+		result.executeResult();
 	}
 }

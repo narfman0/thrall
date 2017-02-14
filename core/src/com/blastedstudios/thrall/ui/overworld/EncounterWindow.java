@@ -28,7 +28,7 @@ public class EncounterWindow extends Window{
 			final Button optionButton = new TextButton(option.getChoiceText(), skin);
 			optionButton.addListener(new ClickListener() {
 				@Override public void clicked(InputEvent event, float x, float y) {
-					option.getResult().executeResult(world);
+					option.execute(world);
 					listener.closeClicked();
 				}
 			});

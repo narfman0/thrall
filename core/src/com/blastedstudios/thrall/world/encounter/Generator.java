@@ -36,29 +36,34 @@ public class Generator {
 		String encounterText = "";
 		if(entity instanceof FarmEntity){
 			encounterText = "You have come upon a farm, where the proprieters offer food in return for gentleness.";
-			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", (w) -> {
+			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", () -> {
 				world.addFood(world.random.nextFloat()*3f+2);
+			}));
+			options.add(new EncounterSuccessFailOption(.75f, "75%: Cmon pops - grease or get greased", () -> {
+				world.addCash(world.random.nextInt(20)+30);
+			}, () -> {
+				world.addCash(world.random.nextInt(2)+3);
 			}));
 		}else if(entity instanceof MineEntity){
 			encounterText = "You have come upon a mine, where the proprieters offer iron in return for gentleness.";
-			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", (w) -> {
+			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", () -> {
 				world.addIron(world.random.nextInt(3)+2);
 			}));
 		}else if(entity instanceof TownEntity){
 			encounterText = "You have come upon a town, where the council offer cash in return for gentleness.";
-			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", (w) -> {
+			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", () -> {
 				world.addCash(world.random.nextInt(10)+3);
 			}));
 			if(world.getCash() >= 100){
 				int fuel = world.random.nextInt(4)+3;
-				options.add(new EncounterOption("Trade 100$ for " + fuel + " fuel", (w) -> {
+				options.add(new EncounterOption("Trade 100$ for " + fuel + " fuel", () -> {
 					world.addFuel(fuel);
 					world.addCash(-100);
 				}));
 			}
 			if(world.getIron() >= 10){
 				int cash = world.random.nextInt(50)+15;
-				options.add(new EncounterOption("Trade 10 iron for " + cash + "$", (w) -> {
+				options.add(new EncounterOption("Trade 10 iron for " + cash + "$", () -> {
 					world.addIron(-10);
 					world.addCash(cash);
 				}));
