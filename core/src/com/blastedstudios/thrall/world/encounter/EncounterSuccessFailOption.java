@@ -3,8 +3,8 @@ package com.blastedstudios.thrall.world.encounter;
 import com.blastedstudios.thrall.world.World;
 
 public class EncounterSuccessFailOption extends EncounterOption{
-	private final float probability; // [0-1]
-	private final IEncounterHandler failure;
+	protected final float probability; // [0-1]
+	protected final IEncounterHandler failure;
 	
 	public EncounterSuccessFailOption(float probability, String choiceText,
 			IEncounterHandler success, IEncounterHandler failure){
@@ -12,12 +12,17 @@ public class EncounterSuccessFailOption extends EncounterOption{
 		this.probability = probability;
 		this.failure = failure;
 	}
+	
+	@Override
+	public String getChoiceText() {
+		return String.format("%.2f", probability) + "%: " + choiceText;
+	}
 
 	@Override
 	public void execute(World world) {
 		if(world.random.nextFloat() <= probability)
-			super.execute(world);
+			result.execute();
 		else
-			failure.executeResult();
+			failure.execute();
 	}
 }

@@ -10,7 +10,8 @@ import com.blastedstudios.thrall.world.entity.MineEntity;
 import com.blastedstudios.thrall.world.entity.TownEntity;
 
 public class Generator {
-	public static final float ENCOUNTER_DISTANCE = 3f;
+	public static final float ENCOUNTER_DISTANCE = 3f,
+			INTIMIDATION_DISPOSITION = .25f;
 	
 	/**
 	 * Check if we should trigger an encounter. Note: this sets the last visited entity too!
@@ -39,10 +40,13 @@ public class Generator {
 			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", () -> {
 				world.addFood(world.random.nextFloat()*3f+2);
 			}));
-			options.add(new EncounterSuccessFailOption(.75f, "75%: Cmon pops - grease or get greased", () -> {
+			float probability = world.random.nextFloat()/10f - .05f + entity.getPlayerDisposition() + .25f;
+			options.add(new EncounterSuccessFailOption(probability, "Cmon pops - grease or get greased", () -> {
 				world.addCash(world.random.nextInt(20)+30);
+				entity.addPlayerDisposition(-INTIMIDATION_DISPOSITION);
 			}, () -> {
 				world.addCash(world.random.nextInt(2)+3);
+				entity.addPlayerDisposition(-INTIMIDATION_DISPOSITION);
 			}));
 		}else if(entity instanceof MineEntity){
 			encounterText = "You have come upon a mine, where the proprieters offer iron in return for gentleness.";

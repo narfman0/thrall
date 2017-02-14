@@ -3,8 +3,8 @@ package com.blastedstudios.thrall.world.encounter;
 import com.blastedstudios.thrall.world.World;
 
 public class EncounterOption {
-	private final String choiceText;
-	private final IEncounterHandler result;
+	protected final String choiceText;
+	protected final IEncounterHandler result;
 	
 	public EncounterOption(String choiceText, IEncounterHandler result){
 		this.choiceText = choiceText;
@@ -16,6 +16,6 @@ public class EncounterOption {
 	}
 
 	public void execute(World world) {
-		result.executeResult();
+		result.execute();
 	}
 }
