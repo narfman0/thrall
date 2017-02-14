@@ -1,6 +1,7 @@
 package com.blastedstudios.thrall.ui.main;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -43,5 +44,14 @@ public class MainScreen extends AbstractScreen {
 	@Override public void render(float delta){
 		super.render(delta);
 		stage.draw();
+	}
+
+	@Override public boolean keyDown(int key) {
+		switch(key){
+		case Keys.ESCAPE:
+			Gdx.app.exit();
+			break;
+		}
+		return super.keyDown(key);
 	}
 }

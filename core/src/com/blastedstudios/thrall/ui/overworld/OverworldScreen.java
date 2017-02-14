@@ -75,8 +75,10 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 			if(world.getEncounter() == null && world.getFuel() > 0f && world.getPeople() > 0f){
 				if(targetClickedLocation != null){
 					if(targetClickedLocation.dst(world.getPlayerVehicle().getPosition()) < 1f ||
-							Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.DOWN) ||
-							Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.LEFT))
+							Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W) ||
+							Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S) ||
+							Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D) ||
+							Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A))
 						targetClickedLocation = null;
 					else{
 						Vector2 direction = targetClickedLocation.cpy().sub(world.getPlayerVehicle().getPosition()).nor();
@@ -98,9 +100,9 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 				camera.position.y += camera.zoom;
 			if(Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S))
 				camera.position.y -= camera.zoom;
-			if(Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.A))
+			if(Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D))
 				camera.position.x += camera.zoom;
-			if(Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.D))
+			if(Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A))
 				camera.position.x -= camera.zoom;
 		}
 		camera.update();
@@ -133,6 +135,18 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 			break;
 		case Keys.ESCAPE:
 			game.popScreen();
+			break;
+		case Keys.NUM_1:
+		case Keys.NUM_2:
+		case Keys.NUM_3:
+		case Keys.NUM_4:
+		case Keys.NUM_5:
+		case Keys.NUM_6:
+		case Keys.NUM_7:
+		case Keys.NUM_8:
+		case Keys.NUM_9:
+			if(encounterWindow != null)
+				encounterWindow.dialogPressed(key - Keys.NUM_0);
 			break;
 		}
 		return super.keyDown(key);
