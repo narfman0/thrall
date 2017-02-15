@@ -1,5 +1,6 @@
 package com.blastedstudios.thrall.world;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -11,6 +12,7 @@ import com.blastedstudios.thrall.world.encounter.Generator;
 import com.blastedstudios.thrall.world.entity.Entity;
 import com.blastedstudios.thrall.world.entity.FarmEntity;
 import com.blastedstudios.thrall.world.entity.MineEntity;
+import com.blastedstudios.thrall.world.entity.NPC;
 import com.blastedstudios.thrall.world.entity.TownEntity;
 import com.blastedstudios.thrall.world.entity.VehicleEntity;
 
@@ -21,7 +23,8 @@ public class World {
 	private final VehicleEntity playerVehicle;
 	public final Random random;
 	private float food, fuel;
-	private int cash, iron, people;
+	private int cash, iron;
+	private List<NPC> people = new LinkedList<>();
 	private Entity lastVisited = null;
 	private final IEncounterListener encounterListener;
 	private Encounter encounter = null;
@@ -47,7 +50,8 @@ public class World {
 			}
 		}
 		entities.add(playerVehicle = new VehicleEntity(new Vector2(), new Vector2()));
-		people = 3;
+		for(int i=0; i<3; i++)
+			people.add(new NPC("name-" + i, random.nextFloat() + 1f, random.nextFloat()*2 + 3));
 		food = 10f;
 		fuel = 100f;
 		Log.log(TAG, "Entities generated: " + entities.size());
@@ -61,9 +65,14 @@ public class World {
 		float velocityScalar = playerVehicle.getVelocity().len();
 		if(velocityScalar > .001f){
 			// only count time as moving when she ship is going. save food+people from starvation when AFK.
-			food = Math.max(0, food-dt/10f*people);
+			food = Math.max(0, food-dt/10f*people.size());
 			if(food <= 0f && random.nextGaussian() > .99f)
-				people = Math.max(0, people-1);
+				for(Iterator<NPC> iter=people.iterator(); iter.hasNext();){
+					NPC npc = iter.next();
+					npc.addHpCurrent(-random.nextFloat()/2f);
+					if(npc.getHpCurrent() <= 0f)
+						iter.remove();
+				}
 		}
 		fuel = Math.max(0, fuel-dt*velocityScalar/10f);
 		encounter = Generator.checkEncounter(this);
@@ -137,16 +146,8 @@ public class World {
 		this.iron += iron;
 	}
 
-	public int getPeople() {
+	public List<NPC> getPeople() {
 		return people;
-	}
-
-	public void setPeople(int people) {
-		this.people = people;
-	}
-	
-	public void addPeople(int people) {
-		this.people += people;
 	}
 
 	public Entity getLastVisited() {

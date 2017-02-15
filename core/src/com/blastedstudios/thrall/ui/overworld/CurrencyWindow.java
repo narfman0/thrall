@@ -43,7 +43,7 @@ public class CurrencyWindow extends Window {
 	public void render(float dt, World world){
 		cashField.setText(world.getCash()+"");
 		ironField.setText(world.getIron()+"");
-		peopleField.setText(world.getPeople()+"");
+		peopleField.setText(world.getPeople().size()+"");
 		foodField.setText((int)world.getFood()+"");
 		fuelField.setText((int)world.getFuel()+"");
 	}

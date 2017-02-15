@@ -57,6 +57,8 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 	
 	@Override public void render(float dt){
 		super.render(dt);
+		if (Gdx.input.isKeyPressed(Keys.APOSTROPHE))
+			dt *= 2f;
 		world.render(dt);
 		currencyWindow.render(dt, world);
 		
@@ -72,7 +74,7 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 		if(followVehicle){
 			camera.position.x = world.getPlayerVehicle().getPosition().x;
 			camera.position.y = world.getPlayerVehicle().getPosition().y;
-			if(world.getEncounter() == null && world.getFuel() > 0f && world.getPeople() > 0f){
+			if(world.getEncounter() == null && world.getFuel() > 0f && !world.getPeople().isEmpty()){
 				if(targetClickedLocation != null){
 					if(targetClickedLocation.dst(world.getPlayerVehicle().getPosition()) < 1f ||
 							Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W) ||
