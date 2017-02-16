@@ -24,7 +24,6 @@ public class World {
 	public final Random random;
 	private float food, fuel;
 	private int cash, iron;
-	private List<NPC> people = new LinkedList<>();
 	private Entity lastVisited = null;
 	private final IEncounterListener encounterListener;
 	private Encounter encounter = null;
@@ -39,19 +38,17 @@ public class World {
 			Vector2 position = new Vector2(random.nextFloat()*100f-50f, random.nextFloat()*100-50f);
 			switch(random.nextInt(3)){
 			case 0:
-				entities.add(new TownEntity(position, new Vector2()));
+				entities.add(new TownEntity(position, new Vector2(), Generator.generateNPCs(random, 12, 35)));
 				break;
 			case 1:
-				entities.add(new MineEntity(position, new Vector2()));
+				entities.add(new MineEntity(position, new Vector2(), Generator.generateNPCs(random, 7, 15)));
 				break;
 			case 2:
-				entities.add(new FarmEntity(position, new Vector2()));
+				entities.add(new FarmEntity(position, new Vector2(), Generator.generateNPCs(random, 3, 5)));
 				break;
 			}
 		}
-		entities.add(playerVehicle = new VehicleEntity(new Vector2(), new Vector2()));
-		for(int i=0; i<3; i++)
-			people.add(new NPC("name-" + i, random.nextFloat() + 1f, random.nextFloat()*2 + 3));
+		entities.add(playerVehicle = new VehicleEntity(new Vector2(), new Vector2(), Generator.generateNPCs(random, 3, 3)));
 		food = 10f;
 		fuel = 100f;
 		Log.log(TAG, "Entities generated: " + entities.size());
@@ -65,9 +62,9 @@ public class World {
 		float velocityScalar = playerVehicle.getVelocity().len();
 		if(velocityScalar > .001f){
 			// only count time as moving when she ship is going. save food+people from starvation when AFK.
-			food = Math.max(0, food-dt/10f*people.size());
+			food = Math.max(0, food-dt/10f*playerVehicle.getNpcs().size());
 			if(food <= 0f && random.nextGaussian() > .99f)
-				for(Iterator<NPC> iter=people.iterator(); iter.hasNext();){
+				for(Iterator<NPC> iter=playerVehicle.getNpcs().iterator(); iter.hasNext();){
 					NPC npc = iter.next();
 					npc.addHpCurrent(-random.nextFloat()/2f);
 					if(npc.getHpCurrent() <= 0f)
@@ -144,10 +141,6 @@ public class World {
 	
 	public void addIron(int iron) {
 		this.iron += iron;
-	}
-
-	public List<NPC> getPeople() {
-		return people;
 	}
 
 	public Entity getLastVisited() {

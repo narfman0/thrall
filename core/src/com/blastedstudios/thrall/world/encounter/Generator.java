@@ -2,17 +2,29 @@ package com.blastedstudios.thrall.world.encounter;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import com.blastedstudios.thrall.world.World;
 import com.blastedstudios.thrall.world.entity.Entity;
 import com.blastedstudios.thrall.world.entity.FarmEntity;
 import com.blastedstudios.thrall.world.entity.MineEntity;
+import com.blastedstudios.thrall.world.entity.NPC;
 import com.blastedstudios.thrall.world.entity.TownEntity;
 
 public class Generator {
 	public static final float ENCOUNTER_DISTANCE = 3f,
 			INTIMIDATION_DISPOSITION = .25f;
-	
+
+	private static String[] NAMES_BEGINNING = { "Kr", "Ca", "Ra", "Mrok", "Cru",
+			"Ray", "Bre", "Zed", "Drak", "Mor", "Jag", "Mer", "Jar", "Mjol",
+			"Zork", "Mad", "Cry", "Zur", "Creo", "Azak", "Azur", "Rei", "Cro",
+			"Mar", "Luk" };
+	private static String[] NAMES_MIDDLE = { "air", "ir", "mi", "sor", "mee", "clo",
+			"red", "cra", "ark", "arc", "miri", "lori", "cres", "mur", "zer",
+			"marac", "zoir", "slamar", "salmar", "urak" };
+	private static String[] NAMES_END = { "d", "ed", "ark", "arc", "es", "er", "der",
+			"tron", "med", "ure", "zur", "cred", "mur" };
+
 	/**
 	 * Check if we should trigger an encounter. Note: this sets the last visited entity too!
 	 * @return generated encounter for the given entity
@@ -31,7 +43,7 @@ public class Generator {
 		}
 		return null;
 	}
-	
+
 	public static Encounter generateEncounter(World world, Entity entity){
 		List<EncounterOption> options = new LinkedList<>();
 		String encounterText = "";
@@ -74,5 +86,23 @@ public class Generator {
 			}
 		}
 		return new Encounter(options, encounterText);
+	}
+
+	public static String generateName(Random random) {
+		return NAMES_BEGINNING[random.nextInt(NAMES_BEGINNING.length)] + 
+				NAMES_MIDDLE[random.nextInt(NAMES_MIDDLE.length)]+
+				NAMES_END[random.nextInt(NAMES_END.length)];
+	}
+
+	public static NPC generateNPC(Random random){
+		return new NPC(generateName(random), random.nextFloat() + 1f, random.nextFloat()*2 + 3);
+	}
+
+	public static List<NPC> generateNPCs(Random random, int min, int max){
+		int count = min + (min == max ? 0 : random.nextInt(max - min));
+		List<NPC> npcs = new LinkedList<>();
+		for(int i=0; i<count; i++)
+			npcs.add(Generator.generateNPC(random));
+		return npcs;
 	}
 }
