@@ -72,8 +72,13 @@ public class World {
 				}
 		}
 		fuel = Math.max(0, fuel-dt*velocityScalar/10f);
-		encounter = Generator.checkEncounter(this);
+		setEncounter(Generator.checkEncounter(this));
+	}
+	
+	public void setEncounter(Encounter encounter){
+		this.encounter = encounter;
 		if(encounter != null){
+			Log.log(TAG, "Starting encounter: " + encounter);
 			encounterListener.triggerEncounter(encounter);
 			playerVehicle.getVelocity().set(0,  0);
 		}

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import com.blastedstudios.thrall.util.Log;
 import com.blastedstudios.thrall.world.World;
 import com.blastedstudios.thrall.world.entity.Entity;
 import com.blastedstudios.thrall.world.entity.FarmEntity;
@@ -12,6 +13,7 @@ import com.blastedstudios.thrall.world.entity.NPC;
 import com.blastedstudios.thrall.world.entity.TownEntity;
 
 public class Generator {
+	private static final String TAG = Generator.class.getName();
 	public static final float ENCOUNTER_DISTANCE = 3f,
 			INTIMIDATION_DISPOSITION = .25f;
 
@@ -52,18 +54,26 @@ public class Generator {
 			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", () -> {
 				world.addFood(world.random.nextFloat()*3f+2);
 			}));
-			float probability = world.random.nextFloat()/10f - .05f + entity.getPlayerDisposition() + .25f;
+			float probability = (float)world.random.nextGaussian()/10f - .05f + entity.getPlayerDisposition() + .25f;
 			options.add(new EncounterSuccessFailOption(probability, "Cmon pops - grease or get greased", () -> {
 				world.addCash(world.random.nextInt(20)+30);
 				entity.addPlayerDisposition(-INTIMIDATION_DISPOSITION);
 			}, () -> {
-				world.addCash(world.random.nextInt(2)+3);
-				entity.addPlayerDisposition(-INTIMIDATION_DISPOSITION);
+				// failed intimidation, fight!
+				world.setEncounter(generateFightEncounter(world, entity, "Come to *my* home and intimidate *me*?"));
 			}));
 		}else if(entity instanceof MineEntity){
 			encounterText = "You have come upon a mine, where the proprieters offer iron in return for gentleness.";
 			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", () -> {
 				world.addIron(world.random.nextInt(3)+2);
+			}));
+			float probability = (float)world.random.nextGaussian()/10f - .05f + entity.getPlayerDisposition() + .25f;
+			options.add(new EncounterSuccessFailOption(probability, "I've killed for less, pony up", () -> {
+				world.addCash(world.random.nextInt(20)+30);
+				entity.addPlayerDisposition(-INTIMIDATION_DISPOSITION);
+			}, () -> {
+				world.addCash(world.random.nextInt(2)+3);
+				entity.addPlayerDisposition(-INTIMIDATION_DISPOSITION);
 			}));
 		}else if(entity instanceof TownEntity){
 			encounterText = "You have come upon a town, where the council offer cash in return for gentleness.";
@@ -86,6 +96,24 @@ public class Generator {
 			}
 		}
 		return new Encounter(options, encounterText);
+	}
+	
+	public static Encounter generateFightEncounter(World world, Entity entity, String text){
+		LinkedList<EncounterOption> options = new LinkedList<>();
+		final int npcDifference = entity.getNpcs().size() - world.getPlayerVehicle().getNpcs().size();
+		float p = 1f - (float)npcDifference/world.getPlayerVehicle().getNpcs().size() - (float)world.random.nextGaussian();
+		Log.log(TAG, "Engaging in fight encounter with npcDifference: " + npcDifference + " p: " + p);
+		options.add(new EncounterSuccessFailOption(p,
+				"Attack", () -> {
+					// won a battle
+					world.addCash(world.random.nextInt(70)+30);
+				}, () -> {
+					// lost a battle
+					world.addCash(-world.random.nextInt(50));
+					for(NPC npc : world.getPlayerVehicle().getNpcs())
+						npc.addHpCurrent(-(world.random.nextFloat()/3f));
+				}));
+		return new Encounter(options, text);
 	}
 
 	public static String generateName(Random random) {

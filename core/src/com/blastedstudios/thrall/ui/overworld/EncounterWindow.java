@@ -29,7 +29,7 @@ public class EncounterWindow extends Window{
 			optionButton.addListener(new ClickListener() {
 				@Override public void clicked(InputEvent event, float x, float y) {
 					option.execute(world);
-					listener.closeClicked();
+					listener.closeClicked(EncounterWindow.this);
 				}
 			});
 			add(optionNumber + ". ");
@@ -43,7 +43,7 @@ public class EncounterWindow extends Window{
 	}
 	
 	interface IEncounterCloseListener {
-		void closeClicked();
+		void closeClicked(Window window);
 	}
 
 	public void dialogPressed(int i) {

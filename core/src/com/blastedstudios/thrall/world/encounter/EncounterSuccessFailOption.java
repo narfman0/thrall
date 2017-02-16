@@ -3,7 +3,7 @@ package com.blastedstudios.thrall.world.encounter;
 import com.blastedstudios.thrall.world.World;
 
 public class EncounterSuccessFailOption extends EncounterOption{
-	protected final float probability; // [0-1]
+	protected final float probability; // [0-1] success
 	protected final IEncounterHandler failure;
 	
 	public EncounterSuccessFailOption(float probability, String choiceText,
@@ -15,7 +15,7 @@ public class EncounterSuccessFailOption extends EncounterOption{
 	
 	@Override
 	public String getChoiceText() {
-		return String.format("%.2f", probability) + "%: " + choiceText;
+		return String.format("%.2f", probability*100) + "%: " + choiceText;
 	}
 
 	@Override

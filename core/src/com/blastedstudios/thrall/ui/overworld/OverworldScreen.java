@@ -170,10 +170,8 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 
 	@Override
 	public void triggerEncounter(Encounter encounter) {
-		stage.addActor(encounterWindow = new EncounterWindow(skin, game, world, () -> {
-			if(encounterWindow != null)
-				encounterWindow.remove();
-			encounterWindow = null;
+		stage.addActor(encounterWindow = new EncounterWindow(skin, game, world, (window) -> {
+			window.remove();
 			world.encounterComplete();
 		}, encounter));
 	}
