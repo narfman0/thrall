@@ -9,7 +9,6 @@ buildscript {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
         classpath 'com.android.tools.build:gradle:1.5.0'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.0'
-		classpath 'me.tatarka:gradle-retrolambda:3.5.0'
     }
 }
 
@@ -109,7 +108,6 @@ project(":html") {
 
 project(":core") {
     apply plugin: "java"
-	apply plugin: 'me.tatarka.retrolambda'
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
