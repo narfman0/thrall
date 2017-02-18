@@ -18,4 +18,8 @@ public class Encounter {
 	public String getEncounterText() {
 		return encounterText;
 	}
+	
+	@Override public String toString(){
+		return "Encounter \"" + encounterText.substring(0, 10) + "...\"";
+	}
 }

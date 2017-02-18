@@ -69,7 +69,7 @@ public class SkillCheckWindow extends Window{
 			Timer.schedule(new Task() {
 				@Override
 				public void run() {
-					listener.checked(SkillCheckWindow.this, result);
+					listener.checked(SkillCheckWindow.this, result/100f);
 				}
 			}, 1);
 		}

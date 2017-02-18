@@ -55,6 +55,7 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 		}
 		sandTexture = new Texture("overworld/sand.jpg");
 		camera.zoom += 3;
+		stage.addActor(new LogWindow(skin));
 	}
 	
 	@Override public void render(float dt){

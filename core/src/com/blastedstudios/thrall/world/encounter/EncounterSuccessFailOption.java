@@ -1,10 +1,12 @@
 package com.blastedstudios.thrall.world.encounter;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.blastedstudios.thrall.util.Log;
 import com.blastedstudios.thrall.world.IEncounterListener;
 import com.blastedstudios.thrall.world.World;
 
 public class EncounterSuccessFailOption extends EncounterOption{
+	private static final String TAG = EncounterSuccessFailOption.class.getCanonicalName();
 	protected final float probability; // [0-1] success
 	protected final IEncounterHandler failure;
 	private final IEncounterListener listener;
@@ -25,10 +27,14 @@ public class EncounterSuccessFailOption extends EncounterOption{
 	@Override
 	public void execute(World world) {
 		listener.triggerSkillCheck((Window window, float resultProbability) -> {
-			if(world.random.nextFloat() <= probability*resultProbability)
+			float roll = world.random.nextFloat();
+			float successChance = probability*resultProbability;
+			if(roll <= probability*resultProbability)
 				result.execute();
 			else
 				failure.execute();
+			Log.log(TAG, String.format("Rolled %.2f vs p=%.2f*%.2f=%.2f",
+					1f-roll, probability, resultProbability, successChance));
 		});
 	}
 }
