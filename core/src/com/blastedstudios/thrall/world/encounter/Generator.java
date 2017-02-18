@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.blastedstudios.thrall.util.Log;
+import com.blastedstudios.thrall.world.IEncounterListener;
 import com.blastedstudios.thrall.world.World;
 import com.blastedstudios.thrall.world.entity.Entity;
 import com.blastedstudios.thrall.world.entity.FarmEntity;
@@ -31,14 +32,14 @@ public class Generator {
 	 * Check if we should trigger an encounter. Note: this sets the last visited entity too!
 	 * @return generated encounter for the given entity
 	 */
-	public static Encounter checkEncounter(World world){
+	public static Encounter checkEncounter(World world, IEncounterListener listener){
 		for(Entity entity : world.getEntities()){
 			if(entity == world.getPlayerVehicle())
 				continue;
 			if(world.getPlayerVehicle().getPosition().dst(entity.getPosition()) < ENCOUNTER_DISTANCE/2f){
 				if(world.getLastVisited() != entity){
 					world.setLastVisited(entity);
-					return generateEncounter(world, entity);
+					return generateEncounter(world, entity, listener);
 				}
 			}else if(world.getLastVisited() == entity)
 				world.setLastVisited(null);
@@ -46,7 +47,7 @@ public class Generator {
 		return null;
 	}
 
-	public static Encounter generateEncounter(World world, Entity entity){
+	public static Encounter generateEncounter(World world, Entity entity, IEncounterListener listener){
 		List<EncounterOption> options = new LinkedList<>();
 		String encounterText = "";
 		if(entity instanceof FarmEntity){
@@ -55,12 +56,13 @@ public class Generator {
 				world.addFood(world.random.nextFloat()*3f+2);
 			}));
 			float probability = (float)world.random.nextGaussian()/10f - .05f + entity.getPlayerDisposition() + .25f;
-			options.add(new EncounterSuccessFailOption(probability, "Cmon pops - grease or get greased", () -> {
+			options.add(new EncounterSuccessFailOption(probability, listener, "Cmon pops - grease or get greased", () -> {
 				world.addCash(world.random.nextInt(20)+30);
 				entity.addPlayerDisposition(-INTIMIDATION_DISPOSITION);
+				world.encounterComplete();
 			}, () -> {
 				// failed intimidation, fight!
-				world.setEncounter(generateFightEncounter(world, entity, "Come to *my* home and intimidate *me*?"));
+				world.setEncounter(generateFightEncounter(world, entity, listener, "Come to *my* home and intimidate *me*?"));
 			}));
 		}else if(entity instanceof MineEntity){
 			encounterText = "You have come upon a mine, where the proprieters offer iron in return for gentleness.";
@@ -68,23 +70,27 @@ public class Generator {
 				world.addIron(world.random.nextInt(3)+2);
 			}));
 			float probability = (float)world.random.nextGaussian()/10f - .05f + entity.getPlayerDisposition() + .25f;
-			options.add(new EncounterSuccessFailOption(probability, "I've killed for less, pony up", () -> {
+			options.add(new EncounterSuccessFailOption(probability, listener, "I've killed for less, pony up", () -> {
 				world.addCash(world.random.nextInt(20)+30);
 				entity.addPlayerDisposition(-INTIMIDATION_DISPOSITION);
+				world.encounterComplete();
 			}, () -> {
 				world.addCash(world.random.nextInt(2)+3);
 				entity.addPlayerDisposition(-INTIMIDATION_DISPOSITION);
+				world.encounterComplete();
 			}));
 		}else if(entity instanceof TownEntity){
 			encounterText = "You have come upon a town, where the council offer cash in return for gentleness.";
 			options.add(new EncounterOption("Your generous offer is accepted, and good day to you", () -> {
 				world.addCash(world.random.nextInt(10)+3);
+				world.encounterComplete();
 			}));
 			if(world.getCash() >= 100){
 				int fuel = world.random.nextInt(4)+3;
 				options.add(new EncounterOption("Trade 100$ for " + fuel + " fuel", () -> {
 					world.addFuel(fuel);
 					world.addCash(-100);
+					world.encounterComplete();
 				}));
 			}
 			if(world.getIron() >= 10){
@@ -92,26 +98,29 @@ public class Generator {
 				options.add(new EncounterOption("Trade 10 iron for " + cash + "$", () -> {
 					world.addIron(-10);
 					world.addCash(cash);
+					world.encounterComplete();
 				}));
 			}
 		}
 		return new Encounter(options, encounterText);
 	}
 	
-	public static Encounter generateFightEncounter(World world, Entity entity, String text){
+	public static Encounter generateFightEncounter(World world, Entity entity, IEncounterListener listener, String text){
 		LinkedList<EncounterOption> options = new LinkedList<>();
 		final int npcDifference = entity.getNpcs().size() - world.getPlayerVehicle().getNpcs().size();
 		float p = 1f - (float)npcDifference/world.getPlayerVehicle().getNpcs().size() - (float)world.random.nextGaussian();
 		Log.log(TAG, "Engaging in fight encounter with npcDifference: " + npcDifference + " p: " + p);
-		options.add(new EncounterSuccessFailOption(p,
+		options.add(new EncounterSuccessFailOption(p, listener,
 				"Attack", () -> {
 					// won a battle
 					world.addCash(world.random.nextInt(70)+30);
+					world.encounterComplete();
 				}, () -> {
 					// lost a battle
 					world.addCash(-world.random.nextInt(50));
 					for(NPC npc : world.getPlayerVehicle().getNpcs())
 						npc.addHpCurrent(-(world.random.nextFloat()/3f));
+					world.encounterComplete();
 				}));
 		return new Encounter(options, text);
 	}

@@ -14,10 +14,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.blastedstudios.thrall.Thrall;
 import com.blastedstudios.thrall.ui.AbstractGame;
 import com.blastedstudios.thrall.ui.AbstractScreen;
 import com.blastedstudios.thrall.ui.main.MainScreen;
+import com.blastedstudios.thrall.ui.overworld.SkillCheckWindow.ISkillCheckListener;
 import com.blastedstudios.thrall.util.Log;
 import com.blastedstudios.thrall.world.IEncounterListener;
 import com.blastedstudios.thrall.world.World;
@@ -170,9 +172,14 @@ public class OverworldScreen extends AbstractScreen implements IEncounterListene
 
 	@Override
 	public void triggerEncounter(Encounter encounter) {
-		stage.addActor(encounterWindow = new EncounterWindow(skin, game, world, (window) -> {
+		stage.addActor(encounterWindow = new EncounterWindow(skin, game, world, (window) -> window.remove(), encounter));
+	}
+
+	@Override
+	public void triggerSkillCheck(ISkillCheckListener listener) {
+		stage.addActor(new SkillCheckWindow(skin, game, (Window window, float result) -> {
 			window.remove();
-			world.encounterComplete();
-		}, encounter));
+			listener.checked(window, result);
+		}));
 	}
 }

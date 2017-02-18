@@ -72,7 +72,7 @@ public class World {
 				}
 		}
 		fuel = Math.max(0, fuel-dt*velocityScalar/10f);
-		setEncounter(Generator.checkEncounter(this));
+		setEncounter(Generator.checkEncounter(this, encounterListener));
 	}
 	
 	public void setEncounter(Encounter encounter){
