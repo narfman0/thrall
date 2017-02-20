@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import com.badlogic.gdx.math.Vector2;
 import com.blastedstudios.thrall.util.Log;
 import com.blastedstudios.thrall.world.IEncounterListener;
 import com.blastedstudios.thrall.world.World;
@@ -11,6 +12,7 @@ import com.blastedstudios.thrall.world.entity.Entity;
 import com.blastedstudios.thrall.world.entity.FarmEntity;
 import com.blastedstudios.thrall.world.entity.MineEntity;
 import com.blastedstudios.thrall.world.entity.NPC;
+import com.blastedstudios.thrall.world.entity.RaiderEntity;
 import com.blastedstudios.thrall.world.entity.TownEntity;
 
 public class Generator {
@@ -45,6 +47,11 @@ public class Generator {
 				world.setLastVisited(null);
 		}
 		return null;
+	}
+	
+	public static Encounter generateRandom(World world, IEncounterListener listener){
+		RaiderEntity entity = new RaiderEntity(new Vector2(), new Vector2(), generateNPCs(world.random, 3, 6));
+		return generateEncounter(world, entity, listener);
 	}
 
 	public static Encounter generateEncounter(World world, Entity entity, IEncounterListener listener){
@@ -101,6 +108,25 @@ public class Generator {
 					world.encounterComplete();
 				}));
 			}
+		}else if(entity instanceof RaiderEntity){
+			encounterText = "You stumble upon a group of raiders, looking lean mean and hungry";
+			int foodDemand = world.random.nextInt(3)+3;
+			if(world.getFood() >= foodDemand){
+				options.add(new EncounterOption("Give " +  foodDemand + " food in exchange for not dying", () -> {
+					world.addFood(foodDemand);
+					world.encounterComplete();
+				}));
+			}
+			int fuelDemand = world.random.nextInt(3)+3;
+			if(world.getFuel() >= fuelDemand){
+				options.add(new EncounterOption("Give " +  fuelDemand + " fuel in exchange for not dying", () -> {
+					world.addFuel(fuelDemand);
+					world.encounterComplete();
+				}));
+			}
+			options.add(new EncounterOption("Attack raiders mercilessly", () -> {
+				world.setEncounter(generateFightEncounter(world, entity, listener, "More fun today boys, lock n load!"));
+			}));
 		}
 		return new Encounter(options, encounterText);
 	}

@@ -30,8 +30,8 @@ public class LogWindow extends Window implements LogListener {
 		row();
 		add(textField);
 		add(sendButton);
-		setWidth(400f);
-		setHeight(300f);
+		setWidth(600f);
+		setHeight(150f);
 		Log.addListener(this);
 	}
 	

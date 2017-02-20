@@ -27,6 +27,7 @@ public class World {
 	private Entity lastVisited = null;
 	private final IEncounterListener encounterListener;
 	private Encounter encounter = null;
+	private float dxSinceRandom = 0f;
 	
 	public World(long seed, IEncounterListener encounterListener) {
 		this.encounterListener = encounterListener;
@@ -59,20 +60,29 @@ public class World {
 			return;
 		for (Entity entity : entities)
 			entity.render(dt);
-		float velocityScalar = playerVehicle.getVelocity().len();
-		if(velocityScalar > .001f){
+		float dx = playerVehicle.getVelocity().len() * dt;
+		if(dx > .0001f){
 			// only count time as moving when she ship is going. save food+people from starvation when AFK.
 			food = Math.max(0, food-dt/10f*playerVehicle.getNpcs().size());
-			if(food <= 0f && random.nextGaussian() > .99f)
+			if(food <= 0f && random.nextGaussian() > .99f){
+				Log.debug(TAG, "NPCs starving!");
 				for(Iterator<NPC> iter=playerVehicle.getNpcs().iterator(); iter.hasNext();){
 					NPC npc = iter.next();
 					npc.addHpCurrent(-random.nextFloat()/2f);
 					if(npc.getHpCurrent() <= 0f)
 						iter.remove();
 				}
+			}
 		}
-		fuel = Math.max(0, fuel-dt*velocityScalar/10f);
+		fuel = Math.max(0, fuel-dx/10f);
 		setEncounter(Generator.checkEncounter(this, encounterListener));
+		dxSinceRandom += dx;
+		// TODO use Math.sin (or whatever) to have low probability equation for low dxSinceRandom,
+		// medium and rising for medium dxSinceRandom, then high probability for high dxSinceRandom
+		if(this.encounter == null && dx > 1f && random.nextFloat()*dx < .001f){
+			dxSinceRandom = 0f;
+			setEncounter(Generator.generateRandom(this, encounterListener));
+		}
 	}
 	
 	public void setEncounter(Encounter encounter){
