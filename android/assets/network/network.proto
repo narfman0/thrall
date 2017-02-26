@@ -1,0 +1,14 @@
+syntax = "proto3";
+package proto;
+
+option java_package = "com.blastedstudios.thrall.network";
+option java_outer_classname = "Messages";
+// e.g. protoc --proto_path=%userprofile%\workspace\thrall\data\network --java_out=%userprofile%\workspace\thrall\src\main\java %userprofile%\workspace\thrall\data\network\network.proto
+// @SuppressWarnings({ "unchecked", "unused" })
+
+message NetVehicleState {
+  float pos_x = 1;
+  float pos_y = 2;
+  float vel_x = 3;
+  float vel_y = 5;
+}

@@ -16,13 +16,24 @@ Building
    click `DesktopLauncher.java`, and Run or Debug. You will need to
    change the default directory as thrall-android/assets for paths
    to work properly.
+   
+Network code updates
+
+The process is slightly more compelx for changing the network code.
+To enable the eclipse protobuf building:
+
+#. Right click on thrall-android / properties
+#. Protocol buffer / compiler
+#. Check 'Enable project specific' and 'Compile .proto on save"
+#. Check Options / "Generate Java"
+#. Change java output directory to `../thrall-core/src`
 
 TODO
 ----
 
 Phase1
 
-#. Multiplayer
+#. Multiplayer (establish connection, pass messages)
 #. Basic UI/art
 #. Maaaybe externalized db/assets for encounter content
 
