@@ -22,13 +22,14 @@ TODO
 
 Phase1
 
-#. Overworld encounters (trade, bandits)
+#. Multiplayer
+#. Basic UI/art
+#. Maaaybe externalized db/assets for encounter content
 
 Phase2
 
-#. Create NPCs and a party
 #. Generate combat arenas
-#. Implement skill based button presses to determine efficacy of task
+#. More skill based exercises to determine efficacy of task
 #. Raids
 
 Phase3

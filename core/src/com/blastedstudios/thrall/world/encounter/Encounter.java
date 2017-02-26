@@ -20,6 +20,6 @@ public class Encounter {
 	}
 	
 	@Override public String toString(){
-		return "Encounter \"" + encounterText.substring(0, 10) + "...\"";
+		return "Encounter \"" + encounterText.substring(0, 16) + "...\"";
 	}
 }
